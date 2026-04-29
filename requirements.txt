@@ -1,0 +1,8 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+scikit-learn
+jinja2
+sendgrid
+python-multipart
+requests

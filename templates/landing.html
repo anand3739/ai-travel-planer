@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Travel Planner - Seamless Journeys</title>
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#94ccff",
+                        "on-primary": "#003352",
+                        "secondary": "#ffb68d",
+                        "on-surface": "#dde3ec",
+                        "surface-dim": "#0e141a",
+                        "on-surface-variant": "#c3c7ce",
+                        "surface-container-high": "#252b31",
+                        "surface-container-low": "#161c22",
+                        "surface-variant": "#2f353c",
+                        "outline-variant": "#42474d",
+                    },
+                    fontFamily: {
+                        headline: ["Lexend"],
+                        body: ["Inter"],
+                        label: ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+        .glass-panel { background: rgba(47, 53, 60, 0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+        .primary-gradient { background: linear-gradient(135deg, #94ccff 0%, #3e96d7 100%); }
+        .sunset-gradient { background: linear-gradient(135deg, #ffb68d 0%, #763300 100%); }
+        .text-gradient { background: linear-gradient(to right, #94ccff, #ffb68d); -webkit-background-clip: text; color: transparent; }
+        
+        /* BACKGROUND PATTERN */
+        .bg-pattern {
+            background-image: url('/static/favicon.png');
+            background-size: contain;
+            background-position: center center;
+            background-repeat: no-repeat;
+        }
+
+        /* 3D Scroll Animations */
+        .reveal-3d { opacity: 0; transform: perspective(1000px) rotateX(20deg) translateY(50px) scale(0.95); transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s ease-out; will-change: transform, opacity; }
+        .reveal-3d.active { opacity: 1; transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1); }
+        
+        .reveal-3d-left { opacity: 0; transform: perspective(1000px) rotateY(-20deg) translateX(-50px) scale(0.95); transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s ease-out; will-change: transform, opacity; }
+        .reveal-3d-left.active { opacity: 1; transform: perspective(1000px) rotateY(0deg) translateX(0) scale(1); }
+        
+        .reveal-3d-right { opacity: 0; transform: perspective(1000px) rotateY(20deg) translateX(50px) scale(0.95); transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 1s ease-out; will-change: transform, opacity; }
+        .reveal-3d-right.active { opacity: 1; transform: perspective(1000px) rotateY(0deg) translateX(0) scale(1); }
+    </style>
+</head>
+<body class="bg-surface-dim text-on-surface font-body selection:bg-primary/30 min-h-screen flex flex-col scroll-smooth">
+
+    <!-- Top Navigation Bar -->
+    <nav class="fixed top-0 w-full z-50 bg-slate-950/60 backdrop-blur-xl flex justify-between items-center px-8 py-4 shadow-2xl shadow-slate-950/20 text-on-surface border-b border-surface-variant">
+        <div class="flex items-center gap-4 md:gap-8">
+            <div class="flex items-center gap-2">
+                <img src="/static/favicon.png" alt="Logo" class="w-8 h-8 object-contain" />
+                <span class="text-xl md:text-2xl font-bold tracking-tighter text-slate-50 font-headline">AI Travel Planner</span>
+            </div>
+            <div class="hidden md:flex gap-6 items-center">
+                <a href="#home" class="text-primary font-semibold border-b-2 border-primary pb-1 font-headline text-sm">Home</a>
+                <a href="#about" class="text-slate-300 hover:text-white transition-colors font-headline text-sm">About</a>
+                <a href="#features" class="text-slate-300 hover:text-white transition-colors font-headline text-sm">Features</a>
+            </div>
+        </div>
+        <a href="/create" class="bg-primary text-on-primary px-6 py-2 rounded-full font-headline font-bold text-sm hover:scale-95 active:scale-90 transition-all duration-300 flex items-center gap-2">
+            <i class="fas fa-magic"></i> Start Building
+        </a>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow flex flex-col items-center px-6 pt-32 pb-20 relative overflow-hidden w-full">
+        <!-- Atmospheric Background Element Using Favicon Pattern -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none bg-pattern"></div>
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <!-- HERO SECTION -->
+        <section id="home" class="max-w-5xl w-full mb-20 text-center md:text-left relative z-10 pt-10 reveal-3d">
+            <span class="text-secondary font-label font-medium uppercase tracking-[0.3em] text-xs mb-4 flex items-center justify-center md:justify-start gap-2">
+                <i class="fas fa-sparkles"></i> AI-Powered precision
+            </span>
+            <h1 class="font-headline text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface leading-tight mb-6">
+                Design the <br/><span class="text-primary italic">Ultimate Trip</span> in Seconds
+            </h1>
+            <p class="text-on-surface-variant text-lg md:text-xl max-w-2xl font-light mb-10 mx-auto md:mx-0">
+                Go beyond static bookings. Our local LLMs seamlessly weave real-time flights, destination insights, and dynamic itineraries into one flawless, printable master plan.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <a href="/create" class="primary-gradient px-8 py-4 rounded-full text-white font-headline font-bold text-lg flex justify-center items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20">
+                    <i class="fas fa-plane-departure"></i> Plan My Trip
+                </a>
+                <a href="#features" class="bg-surface-container-high border border-outline-variant px-8 py-4 rounded-full text-on-surface font-headline font-bold text-lg flex justify-center items-center gap-3 hover:bg-surface-variant transition-all hover:scale-105">
+                    <i class="fas fa-arrow-down"></i> Explore Features
+                </a>
+            </div>
+        </section>
+
+        <!-- ABOUT SECTION / Intelligent Architecture -->
+        <section id="about" class="max-w-5xl w-full glass-panel rounded-[2rem] p-8 md:p-12 shadow-2xl relative z-10 mb-20 reveal-3d-left">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h2 class="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter mb-4">Intelligent <span class="text-gradient">Architecture</span></h2>
+                    <p class="text-on-surface-variant text-base md:text-lg font-light leading-relaxed">
+                        Traditional booking engines give you disorganized tabs. We combine Amadeus Flight APIs, Open-Meteo data, and an integrated local LLM (phi3) to generate comprehensive plans instantly—no cloud data leaks.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 mt-8">
+                        <div class="bg-surface-container-low p-6 rounded-2xl border border-surface-variant">
+                            <h4 class="text-3xl font-black text-primary mb-2">100%</h4>
+                            <p class="text-sm font-label text-on-surface-variant uppercase tracking-wider">Privacy First (Local LLM)</p>
+                        </div>
+                        <div class="bg-surface-container-low p-6 rounded-2xl border border-surface-variant">
+                            <h4 class="text-3xl font-black text-secondary mb-2">Live</h4>
+                            <p class="text-sm font-label text-on-surface-variant uppercase tracking-wider">Amadeus Flight Prices</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="relative h-64 md:h-96 rounded-2xl overflow-hidden flex items-center justify-center bg-surface-container-high border border-outline-variant/30">
+                    <div class="absolute inset-0 opacity-20 bg-pattern blur-sm"></div>
+                    <i class="fas fa-globe-americas text-6xl md:text-8xl relative z-10 text-primary drop-shadow-[0_0_25px_rgba(148,204,255,0.5)]"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURES SECTION BENTO -->
+        <section id="features" class="max-w-5xl w-full mt-10 relative z-10">
+            <div class="mb-12 text-center md:text-left">
+                <h2 class="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter mb-4">Everything You Need. <br/><span class="text-gradient">Nothing You Don't.</span></h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Large Card (AI) -->
+                <div class="md:col-span-2 md:row-span-2 bg-surface-container-low hover:bg-surface-container-high transition-all p-8 md:p-10 rounded-[2rem] border border-surface-variant hover:border-primary/50 group reveal-3d-left">
+                    <div class="w-14 h-14 bg-sky-900/40 text-primary rounded-xl flex items-center justify-center text-2xl mb-6 shadow-lg shadow-primary/10">
+                        <i class="fas fa-route"></i>
+                    </div>
+                    <h3 class="font-headline text-2xl font-bold mb-4 text-on-surface">AI Itineraries</h3>
+                    <p class="text-on-surface-variant leading-relaxed text-lg">Our language model digests your preferences to build detailed, day-by-day itineraries focusing on high-impact sights, morning activities, and evening leisure specific to your destination.</p>
+                </div>
+                
+                <!-- Card 2 -->
+                <div class="bg-surface-container-low hover:bg-surface-container-high transition-all p-8 rounded-[2rem] border border-surface-variant hover:border-secondary/50 reveal-3d-right" style="transition-delay: 0.1s;">
+                    <div class="w-12 h-12 bg-orange-900/30 text-secondary rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <h3 class="font-headline text-xl font-bold mb-3 text-on-surface">Live Flights</h3>
+                    <p class="text-on-surface-variant text-sm">Direct integration with Amadeus APIs pulls real-time departure paths and pricing, automatically mapped from your human-readable inputs.</p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-surface-container-low hover:bg-surface-container-high transition-all p-8 rounded-[2rem] border border-surface-variant hover:border-fuchsia-400/50 reveal-3d-right" style="transition-delay: 0.2s;">
+                    <div class="w-12 h-12 bg-fuchsia-900/30 text-fuchsia-400 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fas fa-hotel"></i>
+                    </div>
+                    <h3 class="font-headline text-xl font-bold mb-3 text-on-surface">Smart Stays</h3>
+                    <p class="text-on-surface-variant text-sm">Context-aware hotel recommendations curated for your budget and preferences.</p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="bg-surface-container-low hover:bg-surface-container-high transition-all p-8 rounded-[2rem] border border-surface-variant hover:border-emerald-400/50 reveal-3d-left" style="transition-delay: 0.3s;">
+                    <div class="w-12 h-12 bg-emerald-900/30 text-emerald-400 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fas fa-cloud-sun-rain"></i>
+                    </div>
+                    <h3 class="font-headline text-xl font-bold mb-3 text-on-surface">Atmosphere</h3>
+                    <p class="text-on-surface-variant text-sm">Live forecasting and visual CSS scenes tailored perfectly for your destination.</p>
+                </div>
+                
+                <!-- Wide Card -->
+                <div class="md:col-span-2 bg-surface-container-low hover:bg-surface-container-high transition-all p-8 rounded-[2rem] border border-surface-variant hover:border-indigo-400/50 reveal-3d-right" style="transition-delay: 0.4s;">
+                    <div class="w-12 h-12 bg-indigo-900/30 text-indigo-400 rounded-xl flex items-center justify-center text-xl mb-6">
+                        <i class="fas fa-share-nodes"></i>
+                    </div>
+                    <h3 class="font-headline text-xl font-bold mb-3 text-on-surface">Shareable Output</h3>
+                    <p class="text-on-surface-variant text-sm">A polished, interactive dashboard. Share it via email instantly or download a beautiful PDF generated from the exact state.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="max-w-5xl w-full mt-24 mb-10 text-center glass-panel rounded-[2rem] p-12 border border-primary/20 relative overflow-hidden z-10 reveal-3d">
+            <div class="absolute -top-20 -left-20 w-64 h-64 bg-primary/20 rounded-full blur-[80px] pointer-events-none"></div>
+            <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-secondary/20 rounded-full blur-[80px] pointer-events-none"></div>
+            
+            <h2 class="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter mb-4">Ready to <span class="text-primary italic">Take Off?</span></h2>
+            <p class="text-on-surface-variant text-lg mb-8 max-w-xl mx-auto">
+                Skip the planning stress and let the AI build your perfectly tailored itinerary in seconds.
+            </p>
+            <a href="/create" class="inline-flex items-center gap-3 primary-gradient px-10 py-4 rounded-full text-white font-headline font-bold text-lg hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20 relative group">
+                <span class="absolute inset-0 bg-white/20 rounded-full animate-ping group-hover:block hidden"></span>
+                <i class="fas fa-rocket"></i> Get Started For Free
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-950 px-8 md:px-12 py-12 w-full border-t border-white/5 z-10">
+        <div class="max-w-5xl w-full mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3">
+                <img src="/static/favicon.png" alt="Logo" class="w-6 h-6 grayscale" />
+                <span class="font-headline font-bold text-slate-300">AI Travel Planner</span>
+            </div>
+            <p class="text-slate-500 font-label text-sm">&copy; 2026 AI Travel Planner. Built with local AI.</p>
+            <div class="flex gap-4">
+                <a href="#" class="text-slate-500 hover:text-primary transition-colors text-xl"><i class="fab fa-github"></i></a>
+                <a href="#" class="text-slate-500 hover:text-primary transition-colors text-xl"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.15
+            };
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+            const els = document.querySelectorAll('.reveal-3d, .reveal-3d-left, .reveal-3d-right');
+            els.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

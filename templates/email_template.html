@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your AI Travel Plan</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f5f7fa;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin: 0; padding: 0;">
+        <tr>
+            <td style="padding: 20px;">
+                <!-- CONTAINER -->
+                <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); overflow: hidden;">
+                    
+                    <!-- HEADER -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); padding: 40px 30px; color: white; text-align: center;">
+                            <h1 style="margin: 0; font-size: 32px; font-weight: 700;">✈️ Your Travel Plan</h1>
+                            <p style="margin: 10px 0 0 0; font-size: 18px; opacity: 0.95;">{{ result.details.from }} → {{ result.details.to }}</p>
+                        </td>
+                    </tr>
+
+                    <!-- TRIP DETAILS -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding: 12px; background-color: #f8f9fa; border-left: 4px solid #f97316; margin-bottom: 12px; border-radius: 6px;">
+                                        <p style="margin: 0; font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Departure</p>
+                                        <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">{{ result.details.departure_date }}</p>
+                                    </td>
+                                    <td style="padding: 12px; background-color: #f8f9fa; border-left: 4px solid #f97316; margin-bottom: 12px; border-radius: 6px; margin-left: 12px;">
+                                        <p style="margin: 0; font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Return</p>
+                                        <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">{{ result.details.return_date }}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; background-color: #f8f9fa; border-left: 4px solid #f97316; border-radius: 6px; margin-top: 12px;">
+                                        <p style="margin: 0; font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Travelers</p>
+                                        <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">{{ result.details.adults }} Adult(s), {{ result.details.children }} Child(ren)</p>
+                                    </td>
+                                    <td style="padding: 12px; background-color: #f8f9fa; border-left: 4px solid #f97316; border-radius: 6px; margin-left: 12px; margin-top: 12px;">
+                                        <p style="margin: 0; font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 0.5px;">Trip Type</p>
+                                        <p style="margin: 5px 0 0 0; font-size: 16px; font-weight: 600; color: #1a1a1a;">{{ result.details.trip_type }}</p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+
+                    <!-- SEPARATOR -->
+                    <tr>
+                        <td style="padding: 0 30px;">
+                            <hr style="border: none; border-top: 2px solid #eee; margin: 0;">
+                        </td>
+                    </tr>
+
+                    <!-- OUTBOUND FLIGHTS -->
+                    <tr>
+                        <td style="padding: 30px;">
+                            <h2 style="margin: 0 0 20px 0; font-size: 22px; font-weight: 700; color: #1a1a1a;">✈️ Outbound Flights</h2>
+                            
+                            {% for flight in result.flights.outbound %}
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #f8f9fa;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                            <span style="background: linear-gradient(135deg, #f97316, #ea580c); color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">{{ flight.airline_name }}{% if flight.flight_number %} · {{ flight.flight_number }}{% endif %}</span>
+                                            <span style="font-size: 20px; font-weight: 700; color: #f97316;">₹{{ "%.0f"|format(flight.price) }}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                            <div>
+                                                <p style="margin: 0; font-size: 18px; font-weight: 700; color: #1a1a1a;">{{ flight.departure[:16] | replace('T', ' ') }}</p>
+                                                <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">{{ result.details.from[:3].upper() }}</p>
+                                            </div>
+                                            <div style="text-align: center; flex: 1; margin: 0 20px;">
+                                                <p style="margin: 0; font-size: 12px; color: #999;">{{ flight.duration }}</p>
+                                                <div style="height: 2px; background: #ddd; margin: 8px 0;"></div>
+                                                <p style="margin: 0; font-size: 12px; color: #999;">{{ flight.stop_label }}</p>
+                                            </div>
+                                            <div>
+                                                <p style="margin: 0; font-size: 18px; font-weight: 700; color: #1a1a1a;">{{ flight.arrival[:16] | replace('T', ' ') }}</p>
+                                                <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">{{ result.details.to[:3].upper() }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endfor %}
+                        </td>
+                    </tr>
+
+                    <!-- RETURN FLIGHTS -->
+                    {% if result.flights.return %}
+                    <tr>
+                        <td style="padding: 0 30px 30px 30px;">
+                            <h2 style="margin: 0 0 20px 0; font-size: 22px; font-weight: 700; color: #1a1a1a;">🔄 Return Flights</h2>
+                            
+                            {% for flight in result.flights.return %}
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; overflow: hidden;">
+                                <tr>
+                                    <td style="padding: 20px; background-color: #f8f9fa;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                            <span style="background: linear-gradient(135deg, #f97316, #ea580c); color: white; padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">{{ flight.airline_name }}{% if flight.flight_number %} · {{ flight.flight_number }}{% endif %}</span>
+                                            <span style="font-size: 20px; font-weight: 700; color: #f97316;">₹{{ "%.0f"|format(flight.price) }}</span>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                            <div>
+                                                <p style="margin: 0; font-size: 18px; font-weight: 700; color: #1a1a1a;">{{ flight.departure[:16] | replace('T', ' ') }}</p>
+                                                <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">{{ result.details.to[:3].upper() }}</p>
+                                            </div>
+                                            <div style="text-align: center; flex: 1; margin: 0 20px;">
+                                                <p style="margin: 0; font-size: 12px; color: #999;">{{ flight.duration }}</p>
+                                                <div style="height: 2px; background: #ddd; margin: 8px 0;"></div>
+                                                <p style="margin: 0; font-size: 12px; color: #999;">{{ flight.stop_label }}</p>
+                                            </div>
+                                            <div>
+                                                <p style="margin: 0; font-size: 18px; font-weight: 700; color: #1a1a1a;">{{ flight.arrival[:16] | replace('T', ' ') }}</p>
+                                                <p style="margin: 4px 0 0 0; font-size: 12px; color: #999;">{{ result.details.from[:3].upper() }}</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <!-- SEPARATOR -->
+                    <tr>
+                        <td style="padding: 0 30px;">
+                            <hr style="border: none; border-top: 2px solid #eee; margin: 0;">
+                        </td>
+                    </tr>
+
+                    <!-- HOTELS -->
+                    {% if result.ai_data.hotels %}
+                    <tr>
+                        <td style="padding: 30px;">
+                            <h2 style="margin: 0 0 20px 0; font-size: 22px; font-weight: 700; color: #1a1a1a;">🏨 Recommended Hotels</h2>
+                            
+                            {% for hotel in result.ai_data.hotels %}
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 15px; border: 1px solid #ddd; border-radius: 10px; overflow: hidden; border-top: 4px solid #ea580c;">
+                                <tr>
+                                    <td style="padding: 20px;">
+                                        <h3 style="margin: 0 0 8px 0; font-size: 18px; font-weight: 700; color: #1a1a1a;">{{ hotel.name }}</h3>
+                                        <p style="margin: 0 0 12px 0; font-size: 14px; color: #f97316;">📍 {{ hotel.area }}</p>
+                                        <p style="margin: 0; font-size: 20px; font-weight: 700; color: #ea580c;">₹{{ "%.0f"|format(hotel.price) }}/night</p>
+                                    </td>
+                                </tr>
+                            </table>
+                            {% endfor %}
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <!-- SEPARATOR -->
+                    <tr>
+                        <td style="padding: 0 30px;">
+                            <hr style="border: none; border-top: 2px solid #eee; margin: 0;">
+                        </td>
+                    </tr>
+
+                    <!-- BUDGET BREAKDOWN -->
+                    {% if result.ai_data.budget %}
+                    <tr>
+                        <td style="padding: 30px;">
+                            <h2 style="margin: 0 0 20px 0; font-size: 22px; font-weight: 700; color: #1a1a1a;">💰 Budget Breakdown</h2>
+                            
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding: 12px; text-align: left; font-size: 14px; color: #666; background-color: #f8f9fa; border-radius: 6px 0 0 0;">🏨 Hotel</td>
+                                    <td style="padding: 12px; text-align: right; font-weight: 700; font-size: 16px; color: #1a1a1a; background-color: #f8f9fa; border-radius: 0 6px 0 0;">₹{{ "%.0f"|format(result.ai_data.budget.hotel) }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; text-align: left; font-size: 14px; color: #666;">🍽️ Food</td>
+                                    <td style="padding: 12px; text-align: right; font-weight: 700; font-size: 16px; color: #1a1a1a;">₹{{ "%.0f"|format(result.ai_data.budget.food) }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; text-align: left; font-size: 14px; color: #666;">🚗 Transport</td>
+                                    <td style="padding: 12px; text-align: right; font-weight: 700; font-size: 16px; color: #1a1a1a;">₹{{ "%.0f"|format(result.ai_data.budget.transport) }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 12px; text-align: left; font-size: 14px; color: #666;">🎭 Activities</td>
+                                    <td style="padding: 12px; text-align: right; font-weight: 700; font-size: 16px; color: #1a1a1a;">₹{{ "%.0f"|format(result.ai_data.budget.activities) }}</td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 16px; text-align: left; font-size: 14px; font-weight: 700; color: white; background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 0 0 0 6px;">TOTAL</td>
+                                    <td style="padding: 16px; text-align: right; font-weight: 700; font-size: 20px; color: white; background: linear-gradient(135deg, #f97316, #ea580c); border-radius: 0 0 6px 0;">₹{{ "%.0f"|format(result.ai_data.budget.hotel + result.ai_data.budget.food + result.ai_data.budget.transport + result.ai_data.budget.activities) }}</td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    <!-- FOOTER -->
+                    <tr>
+                        <td style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #ddd;">
+                            <p style="margin: 0 0 15px 0; font-size: 14px; color: #666;">
+                                🌍 <strong>AI Travel Planner</strong> • Making travel planning magical
+                            </p>
+                            <p style="margin: 0; font-size: 12px; color: #999;">
+                                This is your personalized travel plan. Download the full PDF for more details and share it with your travel companions!
+                            </p>
+                        </td>
+                    </tr>
+
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

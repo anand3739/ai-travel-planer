@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Travel Planner — Plan Your Trip</title>
+    <meta name="description" content="Let AI create your perfect travel itinerary. Enter your trip details and get flights, hotels, weather and a day-by-day plan instantly.">
+    <link rel="icon" type="image/png" href="/static/favicon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#94ccff",
+                        "on-primary": "#003352",
+                        "secondary": "#ffb68d",
+                        "on-surface": "#dde3ec",
+                        "surface-dim": "#0e141a",
+                        "on-surface-variant": "#c3c7ce",
+                        "surface-container-high": "#252b31",
+                        "surface-container-low": "#161c22",
+                        "surface-variant": "#2f353c",
+                        "outline-variant": "#42474d",
+                    },
+                    fontFamily: {
+                        headline: ["Lexend"],
+                        body: ["Inter"],
+                        label: ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .material-symbols-outlined { font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24; }
+        .glass-panel { background: rgba(47, 53, 60, 0.6); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .primary-gradient { background: linear-gradient(135deg, #94ccff 0%, #3e96d7 100%); }
+        .text-gradient { background: linear-gradient(to right, #94ccff, #ffb68d); -webkit-background-clip: text; color: transparent; }
+
+        /* BACKGROUND PATTERN */
+        .bg-pattern {
+            background-image: url('/static/favicon.png');
+            background-size: contain;
+            background-position: center center;
+            background-repeat: no-repeat;
+        }
+
+        /* Form Elements */
+        .form-control, .form-select {
+            width: 100%; border-radius: 0.75rem; padding: 0.875rem 1rem;
+            background-color: rgba(22, 28, 34, 0.7) !important; /* surface-container-low */
+            border: 1px solid var(--tw-colors-outline-variant, #42474d);
+            color: #dde3ec !important; transition: all 0.2s; outline: none; font-family: 'Inter', sans-serif;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: #94ccff; box-shadow: 0 0 0 3px rgba(148, 204, 255, 0.2);
+        }
+        .form-select option { background-color: #161c22; color: #dde3ec; }
+        .form-control::placeholder { color: #8d9198; }
+
+        /* Animation */
+        @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes float { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
+        @keyframes progress { 0% { transform:translateX(-100%); } 100% { transform:translateX(320%); } }
+
+        /* Loading Screen keeping Original Video */
+        .loader-screen {
+            display: grid; place-items: center; position: fixed; inset: 0; background: #000; z-index: 9999;
+            opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .3s, visibility .3s;
+        }
+        .loader-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 1; pointer-events: none; }
+        .loader-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(14,20,26,0.9) 100%); pointer-events: none; }
+        .loader-screen.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .loader-card {
+            position: relative; z-index: 1; width: min(420px, calc(100% - 40px)); padding: 40px 32px; border-radius: 24px; text-align: center;
+            color: #dde3ec; border: 1.5px solid rgba(255,255,255,.1); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            background: rgba(14,20,26,0.7); box-shadow: 0 24px 60px rgba(0,0,0,.6); animation: fadeUp .5s cubic-bezier(.16,1,.3,1);
+        }
+        .loader-orbit { width: 100px; height: 100px; margin: 0 auto 24px; position: relative; display: grid; place-items: center; }
+        .loader-ring { position: absolute; inset: 0; border: 3px solid rgba(255,255,255,.1); border-top-color: #94ccff; border-radius: 50%; animation: spin 1.2s linear infinite; }
+        .loader-ring.inner { inset: 16px; animation-duration: .9s; animation-direction: reverse; border-top-color: #ffb68d; }
+        .loader-icon { font-size: 28px; animation: float 2s ease-in-out infinite; color: #94ccff; }
+        .loader-bar { margin-top: 24px; height: 6px; border-radius: 999px; overflow: hidden; background: rgba(255,255,255,.1); }
+        .loader-bar::after { content: ''; display: block; height: 100%; width: 35%; background: linear-gradient(90deg, #94ccff, #3e96d7); border-radius: inherit; animation: progress 1.6s ease-in-out infinite; }
+        body.is-loading { overflow: hidden; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0e141a; }
+        ::-webkit-scrollbar-thumb { background: #2f353c; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #42474d; }
+    </style>
+</head>
+<body class="bg-surface-dim text-on-surface font-body selection:bg-primary/30 min-h-screen flex flex-col pt-10 pb-20 relative px-4 md:px-0 scroll-smooth">
+
+    <!-- Atmospheric Background Element -->
+    <div class="fixed inset-0 opacity-[0.04] pointer-events-none bg-pattern"></div>
+    <div class="fixed -top-40 -left-40 w-96 h-96 bg-primary/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="fixed -bottom-40 -right-40 w-96 h-96 bg-secondary/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <a href="/" class="fixed top-6 left-6 inline-flex items-center gap-2 font-headline text-sm font-bold text-on-surface bg-surface-variant/80 backdrop-blur-md border border-outline-variant/50 rounded-full px-4 py-2 hover:text-primary hover:border-primary/50 transition-all z-50">
+        <i class="fas fa-arrow-left"></i> Home
+    </a>
+
+    <main class="flex-grow flex flex-col items-center w-full max-w-3xl mx-auto mt-10 relative z-10">
+        
+        <!-- Hero -->
+        <div class="w-full text-center glass-panel rounded-[2rem] p-8 md:p-12 mb-8" style="animation: fadeUp 0.6s ease-out forwards;">
+            <div class="inline-flex items-center justify-center gap-2 bg-primary/10 border border-primary/20 text-primary text-xs font-bold font-headline uppercase tracking-wide px-4 py-2 rounded-full mb-6">
+                <i class="fas fa-sparkles"></i> AI-Powered Planning
+            </div>
+            <h1 class="font-headline text-4xl md:text-5xl font-extrabold tracking-tighter text-on-surface mb-3">
+                <span class="text-gradient">AI Travel</span> Planner
+            </h1>
+            <p class="text-on-surface-variant text-lg font-light mb-1">Let AI craft your perfect itinerary in seconds.</p>
+            <p class="text-on-surface-variant text-sm font-light opacity-80">Fill in your details below and hit Generate.</p>
+            
+            <!-- City Recommender Widget -->
+            <div class="mt-8 bg-surface-container/50 border border-primary/20 rounded-2xl p-5 text-left">
+                <div class="text-xs font-headline font-bold text-primary uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <i class="fas fa-city"></i> City Recommender (Optional)
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="text" id="cityKeywordsInput" class="form-control flex-1" placeholder="e.g. beach resort, local food..." maxlength="200">
+                    <button type="button" id="recommendCityBtn" class="primary-gradient text-white font-headline font-bold px-6 py-3 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20 whitespace-nowrap" onclick="recommendCity()">
+                        <i class="fas fa-compass mr-1"></i> Recommend
+                    </button>
+                </div>
+                <div id="cityRecommendations" class="hidden mt-4">
+                    <div class="text-xs font-headline font-bold text-on-surface-variant uppercase tracking-widest mb-2">Top Recommendations:</div>
+                    <div id="cityRecommendationsList" class="flex flex-col gap-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form -->
+        <div class="w-full glass-panel rounded-[2rem] px-6 py-8 md:p-10" style="animation: fadeUp 0.8s ease-out forwards; animation-delay: 0.1s; opacity: 0;">
+            {% if error %}
+            <div class="bg-red-900/20 border border-red-500/50 text-red-300 p-4 rounded-xl mb-6 font-semibold text-sm flex items-center gap-3">
+                <i class="fas fa-exclamation-triangle"></i> {{ error }}
+            </div>
+            {% endif %}
+
+            <form id="tripForm" action="/plan" method="post" onsubmit="return showLoader(event)" class="space-y-8">
+                
+                <!-- Locations -->
+                <div>
+                    <div class="text-sm font-headline font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20"><i class="fas fa-map-marked-alt"></i></div> Travel Locations
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" name="from_location" class="form-control" placeholder="Departure City" value="{{ form_data.from if form_data else '' }}" required>
+                        <input type="text" name="to_location" class="form-control" placeholder="Destination City" value="{{ form_data.to if form_data else '' }}" required>
+                    </div>
+                </div>
+
+                <!-- Dates -->
+                <div>
+                    <div class="text-sm font-headline font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20"><i class="fas fa-calendar-alt"></i></div> Travel Dates
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-2">Departure</label>
+                            <input type="date" name="departure_date" class="form-control" value="{{ form_data.departure_date if form_data else '' }}" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-2">Return (optional)</label>
+                            <input type="date" name="return_date" class="form-control" value="{{ form_data.return_date if form_data else '' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Travelers -->
+                <div>
+                    <div class="text-sm font-headline font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20"><i class="fas fa-users"></i></div> Travelers
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-2">Adults</label>
+                            <input type="number" name="adults" class="form-control" placeholder="Adults" value="1" min="1" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wide mb-2">Children</label>
+                            <input type="number" name="children" class="form-control" placeholder="Children" value="0" min="0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trip Type & Accommodation Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Trip Type -->
+                    <div>
+                        <div class="text-sm font-headline font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20"><i class="fas fa-suitcase-rolling"></i></div> Trip Type
+                        </div>
+                        <select name="trip_type" class="form-select" required>
+                            <option value="solo">Solo Travel</option>
+                            <option value="family">Family Trip</option>
+                            <option value="friends">Friends Group</option>
+                            <option value="office">Office / Corporate</option>
+                            <option value="round_trip">Round Trip</option>
+                        </select>
+                    </div>
+
+                    <!-- Accommodation -->
+                    <div>
+                        <div class="text-sm font-headline font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20"><i class="fas fa-hotel"></i></div> Accommodation
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <select name="stay_type" class="form-select" required>
+                                <option value="" disabled selected hidden>Stay Type</option>
+                                <option value="backpacker">Hostel</option>
+                                <option value="dormitory">Dormitory</option>
+                                <option value="hotel" selected>Hotel</option>
+                                <option value="resort">Resort</option>
+                            </select>
+                            <select name="hotel_category" class="form-select" required>
+                                <option value="" disabled selected hidden>Category</option>
+                                <option value="budget">Budget</option>
+                                <option value="3_star" selected>3-Star</option>
+                                <option value="4_star">4-Star</option>
+                                <option value="luxury">Luxury</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Preferences -->
+                <div>
+                    <div class="text-sm font-headline font-bold text-on-surface uppercase tracking-widest mb-4 flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center border border-primary/20"><i class="fas fa-pen-fancy"></i></div> Trip Preferences
+                    </div>
+                    <textarea name="description" class="form-control" rows="4" placeholder="e.g. historical sites, budget-friendly, local food, adventure activities…">{{ form_data.description if form_data else '' }}</textarea>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full primary-gradient py-5 rounded-2xl text-white font-headline font-extrabold text-lg flex items-center justify-center gap-3 shadow-xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all relative overflow-hidden group" id="submitBtn">
+                        <span class="absolute inset-0 bg-white/20 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"></span>
+                        <i class="fas fa-wand-magic-sparkles"></i> Generate Travel Plan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Loading Screen (Original Video preserved) -->
+    <div id="loadingScreen" class="loader-screen" aria-live="polite">
+        <video class="loader-video" autoplay loop muted playsinline>
+            <source src="/static/fanimation.mp4" type="video/mp4">
+        </video>
+        <div class="loader-overlay"></div>
+        <div class="loader-card">
+            <div class="loader-orbit">
+                <span class="loader-ring"></span>
+                <span class="loader-ring inner"></span>
+                <i class="fas fa-plane-departure loader-icon"></i>
+            </div>
+            <h4 class="font-headline font-bold text-2xl mb-2 text-white">Generating Your Trip</h4>
+            <p id="loadingMsg" class="text-on-surface-variant">Creating your personalized travel plan…</p>
+            <div class="loader-bar"></div>
+        </div>
+    </div>
+
+    <script>
+        let isSubmitting = false;
+
+        // ---- City Recommender ----
+        async function recommendCity() {
+            const keywords = document.getElementById('cityKeywordsInput').value.trim();
+            const btn = document.getElementById('recommendCityBtn');
+            const resultsContainer = document.getElementById('cityRecommendations');
+            const resultsList = document.getElementById('cityRecommendationsList');
+
+            if (!keywords) { alert('Please enter keywords'); return; }
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching…';
+
+            try {
+                const response = await fetch(`/api/recommend-city?keywords=${encodeURIComponent(keywords)}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    resultsList.innerHTML = `<div class="text-red-400 text-sm"><i class="fas fa-exclamation-circle"></i> ${data.error}</div>`;
+                } else if (data.all_recommendations) {
+                    let html = data.all_recommendations.map((rec, idx) => {
+                        const medal = ['🥇', '🥈', '🥉'][idx] || '✨';
+                        return `
+                            <div class="bg-surface-container hover:bg-surface-container-high border border-outline-variant/30 p-3 rounded-lg cursor-pointer transition-all flex justify-between items-center" onclick="setDestination('${rec.city}')">
+                                <div>
+                                    <div class="font-bold text-on-surface text-sm">${medal} ${rec.city}</div>
+                                    <div class="text-xs text-on-surface-variant mt-1">${rec.country}</div>
+                                </div>
+                                <div class="bg-primary/20 text-primary px-3 py-1 rounded border border-primary/30 text-xs font-bold">Select</div>
+                            </div>
+                        `;
+                    }).join('');
+                    resultsList.innerHTML = html;
+                }
+                resultsContainer.classList.remove('hidden');
+            } catch (error) {
+                console.error('City recommendation error:', error);
+                resultsList.innerHTML = '<div class="text-red-400 text-sm"><i class="fas fa-exclamation-circle"></i> Failed to get recommendations</div>';
+                resultsContainer.classList.remove('hidden');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-compass"></i> Recommend';
+            }
+        }
+
+        function setDestination(city) {
+            document.querySelector('input[name="to_location"]').value = city;
+            document.querySelector('input[name="to_location"]').focus();
+            document.querySelector('input[name="to_location"]').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        document.getElementById('cityKeywordsInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); recommendCity(); }
+        });
+
+        // ---- Loading Screen ----
+        const loadingMessages = [
+            'Searching for the best flights…',
+            'Building your day-by-day itinerary…',
+            'Checking hotels and accommodation…',
+            'Fetching live weather data…',
+            'Discovering top local attractions…',
+            'Almost there — finalizing your plan…',
+        ];
+
+        function showLoader(event) {
+            if (isSubmitting) { event.preventDefault(); return false; }
+            isSubmitting = true;
+
+            const loader = document.getElementById('loadingScreen');
+            const btn = document.getElementById('submitBtn');
+            loader.classList.add('active');
+            document.body.classList.add('is-loading');
+            btn.disabled = true;
+
+            let msgIndex = 0;
+            const msgEl = document.getElementById('loadingMsg');
+            const msgInterval = setInterval(() => {
+                msgEl.textContent = loadingMessages[msgIndex % loadingMessages.length];
+                msgIndex++;
+            }, 2800);
+
+            window.addEventListener('pageshow', () => clearInterval(msgInterval), { once: true });
+            return true;
+        }
+
+        window.addEventListener('pageshow', () => {
+            isSubmitting = false;
+            document.getElementById('loadingScreen').classList.remove('active');
+            document.body.classList.remove('is-loading');
+            document.getElementById('submitBtn').disabled = false;
+        });
+    </script>
+</body>
+</html>
